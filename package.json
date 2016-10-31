@@ -1,0 +1,20 @@
+{
+  "name": "instagram-oauth-test",
+  "version": "0.0.1",
+  "description": "Testing Instagram OAuth Test",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "lodash": "^4.16.5",
+    "q": "^1.4.1",
+    "query-string": "^4.2.3",
+    "request": "^2.76.0",
+    "request-promise": "^4.1.1"
+  }
+}
