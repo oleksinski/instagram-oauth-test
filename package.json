@@ -11,6 +11,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "fs": "0.0.1-security",
     "lodash": "^4.16.5",
     "q": "^1.4.1",
     "query-string": "^4.2.3",
