@@ -5,9 +5,9 @@ var request = require('request');
 
 var instagram = {
     client: {
-        id: '',
-        secret: '',
-        redirect_uri: 'http://localhost:8081/redirect'
+        id: '{CLIENT_ID}', // get on https://www.instagram.com/developer
+        secret: '{CLIENT_SECRET}', // get on https://www.instagram.com/developer
+        redirect_uri: '{REDIRECT_URL}' // get on https://www.instagram.com/developer
     },
     endpoints: {
         server: {
