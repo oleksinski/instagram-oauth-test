@@ -1,0 +1,28 @@
+<html>
+<title>Instagram OAuth Test</title>
+<body>
+Sign In to Instagram:
+<form action="/retrieve_access_token" method="POST" enctype="application/x-www-form-urlencoded">
+    <input type="submit" value="Proceed">
+</form>
+
+<br />
+
+<ul>
+    <li><a href="/follow/single/followers">followers</a></li>
+    <li><a href="/follow/single/following">following</a></li>
+    <!--<li><a href="/follow/multi/following/followers">following -> not followers</a></li>-->
+    <!--<li><a href="/follow/multi/followers/following">followers -> not following</a></li>-->
+</ul>
+
+<br />
+
+<img src="/static/relationship_intersection.png" alt="" usemap="#Map" />
+<map name="Map" id="Map">
+    <area alt="mutual" title="mutual" href="/follow/mutual" shape="poly" coords="132,152,156,98,131,45,108,97" />
+    <area alt="following-followers" title="following-followers" href="/follow/multi/following/followers" shape="poly" coords="242,143,184,171,141,151,165,100,144,43,177,25,241,47,261,95" />
+    <area alt="followers-following" title="followers-following" href="/follow/multi/followers/following" shape="poly" coords="88,170,119,151,99,98,121,46,83,26,47,34,25,51,10,79,12,123,41,160" />
+</map>
+
+</body>
+</html>

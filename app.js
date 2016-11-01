@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var queryString = require('query-string');
 var request = require('request');
 var fs = require('fs');
+var _ = require('underscore');
 
 var instagram = {
     client: {
@@ -26,7 +27,7 @@ var POST = 'body';
 
 var app = express();
 
-app.use(express.static('public'));
+app.use('/static', express.static(__dirname + '/static'));
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -34,11 +35,10 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/' + 'index.html');
+    res.sendFile(__dirname + '/views/index.html');
 });
 
 app.post('/retrieve_access_token', function (req, res) {
-    console.log('Got a POST request');
     res.redirect(getServerAuthorizeUrl());
 });
 
@@ -51,7 +51,7 @@ app.get('/redirect', function (req, res) {
     };
 
     if (errorResponse.error) {
-        res.end(JSON.stringify(errorResponse));
+        jsonPrint(res, errorResponse);
     } else {
         var code = req[GET].code;
 
@@ -82,18 +82,6 @@ app.get('/redirect', function (req, res) {
                     }
                     jsonPrint(res, data);
                 } else {
-                    // Response from Instagram API
-                    //
-                    // {
-                    //     "access_token": "...",
-                    //     "user": {
-                    //     "id": "...",
-                    //         "username": "...",
-                    //         "full_name": "...",
-                    //         "profile_picture": "..."
-                    //     }
-                    // }
-
                     jsonPrint(res, data);
                 }
             });
@@ -113,18 +101,34 @@ app.get('/follow/single/:p', function (req, res) {
         if (err) {
             jsonPrint(res, err);
         } else {
-            var users = {};
-            var size = 0;
-            for(var i in json) {
-                if (json.hasOwnProperty(i)) {
-                    users[i] = json[i];
-                    size++;
+            jsonPrint(res, getJSONResult(json, p));
+        }
+    });
+});
+
+app.get('/follow/mutual', function (req, res) {
+    readJSONFile(__dirname + '/data/followers.json', function (err, json1) {
+        if (err) {
+            jsonPrint(res, err);
+        } else {
+            readJSONFile(__dirname + '/data/following.json', function (err, json2) {
+                if (err) {
+                    jsonPrint(res, err);
+                } else {
+                    var json = {};
+                    var intersection = _.intersection(Object.keys(json1), Object.keys(json2));
+                    for(var i in intersection) {
+                        var key = intersection[i];
+
+                        if (json1.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+                            json[key] = json1[key];
+                        }
+                        if (json2.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+                            json[key] = json2[key];
+                        }
+                    }
+                    jsonPrint(res, getJSONResult(json, ('mutual(followers, following)')));
                 }
-            }
-            jsonPrint(res, {
-                title: p,
-                total: size,
-                users: json
             });
         }
     });
@@ -143,18 +147,12 @@ app.get('/follow/multi/:p1/:p2', function(req, res) {
                     jsonPrint(res, err);
                 } else {
                     var json = {};
-                    var size = 0;
                     for(var i in json1) {
                         if (json1.hasOwnProperty(i) && !json2.hasOwnProperty(i)) {
                             json[i] = json1[i];
-                            size++;
                         }
                     }
-                    jsonPrint(res, {
-                        title: p1 + ' - ' + p2,
-                        total: size,
-                        users: json
-                    });
+                    jsonPrint(res, getJSONResult(json, (p1+'-'+p2)));
                 }
             });
         }
@@ -197,4 +195,12 @@ function readJSONFile(filename, callback) {
             callback(exception);
         }
     });
+}
+
+function getJSONResult(json, title) {
+    return {
+        title: title,
+        total: json && typeof json === 'object' ? Object.keys(json).length : 0,
+        json: json
+    };
 }
