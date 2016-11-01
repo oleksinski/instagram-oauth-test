@@ -1,1 +1,18 @@
-{}
+{
+  "user1": {
+    "alias": "user1",
+    "name": "John Smith"
+  },
+  "user3": {
+    "alias": "user3",
+    "name": "James"
+  },
+  "user6": {
+    "alias": "user6",
+    "name": "Ola"
+  },
+  "user7": {
+    "alias": "user7",
+    "name": "Alex"
+  }
+}
