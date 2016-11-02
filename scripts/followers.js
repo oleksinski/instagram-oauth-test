@@ -28,23 +28,25 @@
     var users = document.getElementsByClassName(classes.users)[0].getElementsByClassName(classes.user);
 
     for(var i in users) {
-        var user = users[i];
-
         if (users.hasOwnProperty(i)) {
-            var userName = user.getElementsByClassName(classes.name)[0].textContent;
-            //console.log(userName);
+            var user = users[i];
 
-            var userAlias = user.getElementsByClassName(classes.alias)[0].textContent;
-            //console.log(userAlias);
+            if (user.getElementsByClassName) {
+                var userName = user.getElementsByClassName(classes.name)[0].textContent;
+                //console.log(userName);
 
-            var userAvatar = user.getElementsByClassName(classes.avatar)[0].src;
-            //console.log(userAvatar);
+                var userAlias = user.getElementsByClassName(classes.alias)[0].textContent;
+                //console.log(userAlias);
 
-            json[userAlias] = {
-                alias: userAlias,
-                name: userName,
-                avatar: userAvatar
-            };
+                var userAvatar = user.getElementsByClassName(classes.avatar)[0].src;
+                //console.log(userAvatar);
+
+                json[userAlias] = {
+                    alias: userAlias,
+                    name: userName,
+                    avatar: userAvatar
+                };
+            }
         }
     }
 

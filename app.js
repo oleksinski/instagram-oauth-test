@@ -5,6 +5,15 @@ var request = require('request');
 var fs = require('fs');
 var _ = require('underscore');
 
+var data = {
+    followers: require('./data/followers.json'),
+    following: require('./data/following.json'),
+    exclude: {
+        followers: require('./data/exclude/followers.json'),
+        following: require('./data/exclude/following.json')
+    }
+};
+
 var instagram = {
     client: {
         id: '{CLIENT_ID}', // get on https://www.instagram.com/developer
@@ -35,6 +44,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
+    //jsonPrint(res, data);
     res.sendFile(__dirname + '/views/index.html');
 });
 
@@ -90,73 +100,55 @@ app.get('/redirect', function (req, res) {
             jsonPrint(res, {error: 'No code received'});
         }
     }
-
 });
 
 // === Proceed files /data/followers.json & /data/following.json === //
 
 app.get('/follow/single/:p', function (req, res) {
     var p = req.params.p;
-    readJSONFile(__dirname + '/data/' + p + '.json', function (err, json) {
-        if (err) {
-            jsonPrint(res, err);
-        } else {
-            jsonPrint(res, getJSONResult(json, p));
-        }
-    });
+    jsonPrint(res, getJSONResult(data[p], p));
+});
+
+app.get('/follow/single/exclude/:p', function (req, res) {
+    var p = req.params.p;
+    jsonPrint(res, getJSONResult(data['exclude'][p], 'exclude ' + p));
 });
 
 app.get('/follow/mutual', function (req, res) {
-    readJSONFile(__dirname + '/data/followers.json', function (err, json1) {
-        if (err) {
-            jsonPrint(res, err);
-        } else {
-            readJSONFile(__dirname + '/data/following.json', function (err, json2) {
-                if (err) {
-                    jsonPrint(res, err);
-                } else {
-                    var json = {};
-                    var intersection = _.intersection(Object.keys(json1), Object.keys(json2));
-                    for(var i in intersection) {
-                        var key = intersection[i];
+    var followersJSON = data['followers'];
+    var followingJSON = data['following'];
+    var json = {};
+    var intersection = _.intersection(Object.keys(followersJSON), Object.keys(followingJSON));
+    for(var i in intersection) {
+        var key = intersection[i];
 
-                        if (json1.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
-                            json[key] = json1[key];
-                        }
-                        if (json2.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
-                            json[key] = json2[key];
-                        }
-                    }
-                    jsonPrint(res, getJSONResult(json, ('mutual(followers, following)')));
-                }
-            });
+        if (followersJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+            json[key] = followersJSON[key];
         }
-    });
+        if (followingJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+            json[key] = followingJSON[key];
+        }
+    }
+    jsonPrint(res, getJSONResult(json, ('mutual(followers, following)')));
 });
 
 // :following/:followers
-app.get('/follow/multi/:p1/:p2', function(req, res) {
+app.get('/follow/multi/:p1/:p2/:p3', function(req, res) {
     var p1 = req.params.p1;
     var p2 = req.params.p2;
-    readJSONFile(__dirname + '/data/' + p1 + '.json', function (err, json1) {
-        if (err) {
-            jsonPrint(res, err);
-        } else {
-            readJSONFile(__dirname + '/data/' + p2 + '.json', function (err, json2) {
-                if (err) {
-                    jsonPrint(res, err);
-                } else {
-                    var json = {};
-                    for(var i in json1) {
-                        if (json1.hasOwnProperty(i) && !json2.hasOwnProperty(i)) {
-                            json[i] = json1[i];
-                        }
-                    }
-                    jsonPrint(res, getJSONResult(json, (p1+'-'+p2)));
-                }
-            });
+    var p3 = req.params.p3;
+    var json1 = data[p1];
+    var json2 = data[p2];
+    var excludeJson = data['exclude'][p1];
+    var json = {};
+    for(var i in json1) {
+        if (json1.hasOwnProperty(i) && !json2.hasOwnProperty(i)) {
+            if (p3 !== 'exclude' || Object.keys(excludeJson).length === 0 || !excludeJson.hasOwnProperty(i)) {
+                json[i] = json1[i];
+            }
         }
-    });
+    }
+    jsonPrint(res, getJSONResult(json, (p1+'-'+p2)));
 });
 
 app.listen(8081, function () {});
@@ -183,19 +175,33 @@ function jsonPrint(res, json) {
     res.end(JSON.stringify(json));
 }
 
-function readJSONFile(filename, callback) {
-    fs.readFile(filename, function (err, data) {
-        if(err) {
-            callback(err);
-            return;
-        }
-        try {
-            callback(null, JSON.parse(data));
-        } catch(exception) {
-            callback(exception);
-        }
-    });
-}
+/**
+ * Usage:
+ *
+ * readJSONFile(filepath, function (err, json) {
+ *  if (err) {
+ *      // fail
+ *   } else {
+ *      // success
+ *   }
+ * });
+ *
+ * @param filename
+ * @param callback
+ */
+// function readJSONFile(filename, callback) {
+//     fs.readFile(filename, function (err, data) {
+//         if(err) {
+//             callback(err);
+//             return;
+//         }
+//         try {
+//             callback(null, JSON.parse(data));
+//         } catch(exception) {
+//             callback(exception);
+//         }
+//     });
+// }
 
 function getJSONResult(json, title) {
     return {
