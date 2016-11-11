@@ -120,13 +120,15 @@ app.get('/follow/mutual', function (req, res) {
     var json = {};
     var intersection = _.intersection(Object.keys(followersJSON), Object.keys(followingJSON));
     for(var i in intersection) {
-        var key = intersection[i];
+        if (intersection.hasOwnProperty(i)) {
+            var key = intersection[i];
 
-        if (followersJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
-            json[key] = followersJSON[key];
-        }
-        if (followingJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
-            json[key] = followingJSON[key];
+            if (followersJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+                json[key] = followersJSON[key];
+            }
+            if (followingJSON.hasOwnProperty(key) && !json.hasOwnProperty(key)) {
+                json[key] = followingJSON[key];
+            }
         }
     }
     jsonPrint(res, getJSONResult(json, ('mutual(followers, following)')));
