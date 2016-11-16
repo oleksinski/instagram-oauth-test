@@ -174,6 +174,7 @@ function getServerAccessTokenUrl(code) {
 }
 
 function jsonPrint(res, json) {
+    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(json));
 }
 

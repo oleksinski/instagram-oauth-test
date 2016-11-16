@@ -38,13 +38,13 @@
                 var userAlias = user.getElementsByClassName(classes.alias)[0].textContent;
                 //console.log(userAlias);
 
-                var userAvatar = user.getElementsByClassName(classes.avatar)[0].src;
+                //var userAvatar = user.getElementsByClassName(classes.avatar)[0].src;
                 //console.log(userAvatar);
 
                 json[userAlias] = {
                     alias: userAlias,
-                    name: userName,
-                    avatar: userAvatar
+                    name: userName
+                    //avatar: userAvatar
                 };
             }
         }
