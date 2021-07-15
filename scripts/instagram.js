@@ -15,38 +15,29 @@
 
 (function getUsersJSON() {
 
-    var json = {};
+    let json = {};
 
-    var classes = {
-        users: '_539vh',
-        user: '_cx1ua',
-        name: '_2uju6',
-        alias: '_4zhc5',
-        avatar: '_a012k'
+    const classes = {
+        users: 'PZuss',
+        user: 'wo9IH',
+        userNameAliasId: 'enpQJ',
+        name: 'wFPL8',
+        alias: '_0imsa',
+        avatar: '_6q-tv'
     };
 
-    var users = document.getElementsByClassName(classes.users)[0].getElementsByClassName(classes.user);
+    const users = document.getElementsByClassName(classes.users)[0].getElementsByClassName(classes.user);
 
     for(var i in users) {
         if (users.hasOwnProperty(i)) {
-            var user = users[i];
+            const userNode = users[i];
+            const userNameAliasNode = userNode.getElementsByClassName(classes.userNameAliasId);
+            const user = userNameAliasNode[0];
 
-            if (user.getElementsByClassName) {
-                var userName = user.getElementsByClassName(classes.name)[0].textContent;
-                //console.log(userName);
+            const userAlias = user.getElementsByClassName(classes.alias)[0].textContent;
+            const userName = user.getElementsByClassName(classes.name)[0].textContent;
 
-                var userAlias = user.getElementsByClassName(classes.alias)[0].textContent;
-                //console.log(userAlias);
-
-                //var userAvatar = user.getElementsByClassName(classes.avatar)[0].src;
-                //console.log(userAvatar);
-
-                json[userAlias] = {
-                    alias: userAlias,
-                    name: userName
-                    //avatar: userAvatar
-                };
-            }
+            json.push([userAlias, userName]);
         }
     }
 
